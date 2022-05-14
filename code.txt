@@ -1,0 +1,10 @@
+suma a b |:
+    write a + b
+:|
+
+main a |:
+    x <- 2
+    y <- 1
+    write x
+    suma x y
+:|
