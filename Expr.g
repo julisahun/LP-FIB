@@ -1,5 +1,5 @@
 grammar Expr;
-root : instr* EOF ;
+root : meth* EOF ;
 expr :                          
 	<assoc=right> expr POW expr             #Power
     	| expr (MULT|DIV) expr              #Mult
@@ -22,7 +22,7 @@ instr : WRITE expr                          #Escriu
     | IF cond body ELSE body                #ElseBool
     | WHILE cond body                       #While
     | VAR ASSIG expr                        #Assig
-    | 
+    | VAR params                            #Invoke
     ;
 cond : expr EQ expr                         #Equal
     |  expr GT expr                         #More

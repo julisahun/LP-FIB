@@ -1,11 +1,10 @@
-x := 1
-y := 1
-centi := 10
-while centi > 0 then
-    write x
-    aux := x
-    x := y
-    y := aux + y
-    centi := centi - 1
-end
+suma a b |:
+    write a + b
+:|
 
+main a |:
+    x <- 2
+    y <- 1
+    write x
+    suma x y
+:|
