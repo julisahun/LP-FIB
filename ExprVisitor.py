@@ -44,8 +44,18 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#Method.
+    def visitMethod(self, ctx:ExprParser.MethodContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#ExecuteBody.
     def visitExecuteBody(self, ctx:ExprParser.ExecuteBodyContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#params.
+    def visitParams(self, ctx:ExprParser.ParamsContext):
         return self.visitChildren(ctx)
 
 
@@ -59,6 +69,11 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#ElseBool.
+    def visitElseBool(self, ctx:ExprParser.ElseBoolContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#While.
     def visitWhile(self, ctx:ExprParser.WhileContext):
         return self.visitChildren(ctx)
@@ -66,6 +81,11 @@ class ExprVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ExprParser#Assig.
     def visitAssig(self, ctx:ExprParser.AssigContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#Invoke.
+    def visitInvoke(self, ctx:ExprParser.InvokeContext):
         return self.visitChildren(ctx)
 
 
