@@ -11,3 +11,11 @@ __pycache__/ExprLexer.cpython-39.pyc
 __pycache__/ExprParser.cpython-39.pyc
 __pycache__/ExprVisitor.cpython-39.pyc
 __pycache__/TreeVisitor.cpython-39.pyc
+.vscode/configurationCache.log
+.gitignore
+.vscode/settings.json
+.vscode/targets.log
+.gitignore
+.vscode/dryrun.log
+__pycache__/EvalVisitor.cpython-39.pyc
+__pycache__/EvalVisitor.cpython-39.pyc

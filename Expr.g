@@ -28,8 +28,6 @@ cond : expr EQ expr                         #Equal
     ;
 
 
-
-
 OP : '(';
 CP : ')';
 OB : '|:';
