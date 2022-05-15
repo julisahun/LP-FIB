@@ -15,6 +15,7 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         return int(l[0].getText())
 
+
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
         if (l[0].getText() == 'main'):
@@ -24,6 +25,7 @@ class EvalVisitor(ExprVisitor):
             raise Exception("que ase tu, ya estoy")
         params = l[1:len(l) - 1]
         dickMeth[l[0].getText()] = [params,l[len(l)-1]]
+
     
     def visitInvoke(self, ctx):
         l = list(ctx.getChildren())
@@ -45,6 +47,12 @@ class EvalVisitor(ExprVisitor):
     def visitVar(self, ctx):
         l = list(ctx.getChildren())
         return dick[l[0].getText()]
+    
+    def visitaLlista(self, ctx):
+        l = list(ctx.getChildren())
+        print(l[1].getText())
+
+
 
     def visitBool(self, ctx):
         l = list(ctx.getChildren())
@@ -56,9 +64,15 @@ class EvalVisitor(ExprVisitor):
         while self.visit(l[1]):
             self.visit(l[3])
 
+
+
     def visitEqual(self, ctx):
         l = list(ctx.getChildren())
-        return self.visit(l[0]) == self.visit(l[2])   
+        return self.visit(l[0]) == self.visit(l[2])  
+
+    def visitNotEqual(self, ctx):
+        l = list(ctx.getChildren())
+        return self.visit(l[0]) != self.visit(l[2])
 
     def visitMore(self, ctx):
         l = list(ctx.getChildren())
@@ -67,6 +81,9 @@ class EvalVisitor(ExprVisitor):
     def visitLess(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) < self.visit(l[2])        
+
+
+
 
     def visitAssig(self, ctx):
         l = list(ctx.getChildren())
