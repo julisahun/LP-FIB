@@ -16,18 +16,25 @@ class TreeVisitor(ExprVisitor):
 
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
+        print(l[0].getText())
         if (l[0].getText() == 'main'):
-            self.visit(l[2])
+            self.visit(l[len(l)-1])
             return
         if dickMeth.get(l[0].getText()) is not None:
-            raise Exception("aaaaaaa Puta")
-        dickMeth[l[0].getText()] = [l[1],l[2]]
+            raise Exception("que ase tu, ya estoy")
+        params = l[1:len(l) - 1]
+        dickMeth[l[0].getText()] = [params,l[len(l)-1]]
     
     def visitInvoke(self, ctx):
         l = list(ctx.getChildren())
-        if dickMeth.get(l[0]) is None or len(dickMeth.get(l[0])[0]) != len(l[1]):
-            raise Exception("Ermano que ase tu")
-        self.visit(dickMeth.get(l[0])[1])
+        if dickMeth.get(l[0].getText()) is None:
+            raise Exception("a quien llamas tu tete")
+        i = 0
+        for val in dickMeth.get(l[0].getText())[0]:
+            dick[val.getText()] = dick[l[i+1].getText()]
+            i = i+1
+        
+        self.visit(dickMeth.get(l[0].getText())[1])
         
 
     def visitExecuteBody(self, ctx):

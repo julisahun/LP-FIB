@@ -9,20 +9,18 @@ expr :
     	| VAR                               #Var
     ;
 
-meth : VAR params body                      #Method
+meth : VAR (VAR)* body                      #Method
     ;
 
 body : OB (instr)* CB                       #ExecuteBody
     ;
-params : (VAR)*
-;
 
 instr : WRITE expr                          #Escriu
     | IF cond body                          #Bool
     | IF cond body ELSE body                #ElseBool
     | WHILE cond body                       #While
     | VAR ASSIG expr                        #Assig
-    | VAR params                            #Invoke
+    | VAR (VAR)*                            #Invoke
     ;
 cond : expr EQ expr                         #Equal
     |  expr GT expr                         #More
