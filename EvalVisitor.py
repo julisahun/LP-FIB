@@ -15,6 +15,10 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         return int(l[0].getText())
 
+    def visitLlista(self, ctx):
+        l = list(ctx.getChildren())
+        return map(self.visit, l[1:len(l)-1])
+
 
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
@@ -47,6 +51,8 @@ class EvalVisitor(ExprVisitor):
     def visitVar(self, ctx):
         l = list(ctx.getChildren())
         return dick[l[0].getText()]
+
+    
     
     def visitaLlista(self, ctx):
         l = list(ctx.getChildren())

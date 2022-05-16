@@ -11,7 +11,7 @@ expr :
     	| VAR                               #Var
     ;
 
-list : OP NUM* CP
+list : OC (NUM ' ')* CC
 ;
 meth : VAR (VAR)* body                      #Method
     ;
@@ -37,6 +37,8 @@ cond : expr EQ expr                         #Equal
 
 OP : '(';
 CP : ')';
+OC : '{';
+CC : '}';
 OB : '|:';
 CB : ':|';
 IDENT : '   ';
