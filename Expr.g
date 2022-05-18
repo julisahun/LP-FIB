@@ -58,7 +58,6 @@ VAR : [a-z]+;
 NUM : [0-9]+ ;
 LLISTA : '{' ([0-9]',')* [0-9] '}' ;
 COMMENT : '~~~' .*? '~~~' -> skip ;
-ANYCHAR : [^~]*;
 
 MES : '+' ;
 SUB : '-';
