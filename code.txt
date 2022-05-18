@@ -9,5 +9,8 @@ main a |:
     l <- {1 2 3 x}
     write x
     suma x y
+    write l
+    x <- 12
     write x
+    write l
 :|

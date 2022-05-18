@@ -12,12 +12,14 @@ class EvalVisitor(ExprVisitor):
 
 
     def visitValor(self, ctx):
+        print("valor")
         l = list(ctx.getChildren())
         return int(l[0].getText())
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
-        return list(map(lambda x: x.getText(), l[1:len(l)-1]))) 
+        return list(map(lambda x: int(x.getText()) if x.getText().isnumeric()
+                        else varsDict[len(varsDict)-1][x.getText()], l[1:len(l)-1]))
 
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
@@ -42,7 +44,6 @@ class EvalVisitor(ExprVisitor):
         
         self.visit(methDict.get(l[0].getText())[1])
         varsDict.pop()
-        
 
     def visitExecuteBody(self, ctx):
         l = list(ctx.getChildren())

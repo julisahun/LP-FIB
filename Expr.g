@@ -7,10 +7,12 @@ expr :
         | expr MES expr                     #Suma
     	| <assoc=right> expr SUB expr       #Resta
     	| NUM                               #Valor
-        | OC (NUM|VAR)* CC                  #Llista
+        | llista                            #Llista
     	| VAR                               #Var
     ;
 
+    
+llista : OC (NUM|VAR)* CC                   
 meth : VAR (VAR)* body                      #Method
     ;
 
