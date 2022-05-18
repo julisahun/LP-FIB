@@ -1,12 +1,13 @@
-~~~ aaaa ~~~
 suma a b |:
     write a + b
 :|
 
 main a |:
     ~~~ inline comment ~~~
-    x <- {1,2,3,4}
+    x <- 2
     y <- 1
+    l <- {1 2 3 x}
     write x
     suma x y
+    write x
 :|

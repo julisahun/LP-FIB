@@ -7,12 +7,10 @@ expr :
         | expr MES expr                     #Suma
     	| <assoc=right> expr SUB expr       #Resta
     	| NUM                               #Valor
-        | list                              #Llista
+        | OC (NUM|VAR)* CC                  #Llista
     	| VAR                               #Var
     ;
 
-list : OC (NUM ' ')* CC
-;
 meth : VAR (VAR)* body                      #Method
     ;
 
@@ -56,7 +54,6 @@ WRITE : 'write';
 ASSIG : '<-';
 VAR : [a-z]+;
 NUM : [0-9]+ ;
-LLISTA : '{' ([0-9]',')* [0-9] '}' ;
 COMMENT : '~~~' .*? '~~~' -> skip ;
 
 MES : '+' ;
@@ -65,3 +62,4 @@ MULT : '*';
 DIV : '/';
 POW : '^';
 WS : [ \n]+ -> skip ;
+SPACE : ' '-> skip;
