@@ -1,18 +1,4 @@
-Suma a b |:
-    <!> a + b
-:|
-
 Main |:
-    ~~~ inline comment ~~~
-    x <- 2
-    <!> x
-    <!> "maria petarda"
-    l <- {1 2 3 x}
-    <!> l
-    <!> l[1]
-    l << 5
-    <!> l    
-    <!> #l
-    l 8< 2
-    <!> l
+    n <- A5
+    <!> n
 :|

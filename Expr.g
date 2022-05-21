@@ -13,6 +13,7 @@ expr :
         | VAR OV expr CV                    #Acces
         | HASHTG VAR                        #Length
         | PARAULA                           #Paraula
+        | NOTA                              #Nota
     ;
 
     
@@ -25,10 +26,11 @@ body : OB (instr)* CB                       #ExecuteBody
     ;
 
 
-instr : WRITE expr                          #Escriu
+instr : WRITE (expr)+                       #Escriu
     | READ VAR                              #Llegeix
-    | IF cond body                          #Bool
-    | IF cond body ELSE body                #ElseBool
+    | PLAY expr                             #Play
+    | IF cond body                          #If
+    | IF cond body ELSE body                #ElseIf
     | WHILE cond body                       #While
     | VAR ASSIG expr                        #Assig
     | HEADER (VAR)*                         #Invoke
@@ -38,8 +40,10 @@ instr : WRITE expr                          #Escriu
 
 cond : expr EQ expr                         #Equal
     |  expr NEQ expr                        #NotEqual
-    |  expr GT expr                         #More
+    |  expr GT expr                         #Greater
     |  expr LT expr                         #Less
+    |  expr GE expr                         #GreaterEqual
+    |  expr LE expr                         #LessEqual
     ;
 
 
@@ -55,21 +59,27 @@ IDENT : '   ';
 IF : 'if';
 ELSE : 'else';
 WHILE : 'while';
-READ : '<?>';
+
 GT : '>';
+GE : '>=' ;
 LT : '<';
+LE : '<=' ;
 EQ : '=';
 NEQ : '/=';
 APPEND : '<<';
 THEN : 'then';
 END : 'end'; 
 WRITE : '<!>';
+READ : '<?>';
+PLAY : '<:>' ;
 ASSIG : '<-';
-VAR : [a-z]+;
+VAR : [a-z]([a-z]|[A-Z])*;
 NUM : [0-9]+ ;
-HEADER : [A-Z][a-z]*;
+NOTA : [A-G][0-8] ;
+BOOLEAN : ('true'| 'false') ;
+HEADER : [A-Z]([a-z]|[A-Z])*;
 COMMENT : '~~~' .*? '~~~' -> skip ;
-PARAULA : '"' ([a-z]|[A-Z]|' ')* '"' ;
+PARAULA : '"' .*? '"' ;
 HASHTG : '#' ;
 CUT : '8<' ;
 

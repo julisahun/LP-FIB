@@ -10,6 +10,7 @@ else:
 
 varsDict = [{}]
 methDict = {}
+notes = dict(A=0, B=1, C=2, D=3, E=4, F=5, G=6)
 
 class EvalVisitor(ExprVisitor):
 
@@ -25,7 +26,7 @@ class EvalVisitor(ExprVisitor):
         varsDict[len(varsDict)-1][var] = value
 
     def isVar(self, var):
-        return varsDict[len(varsDict)-1][var] is not None
+        return varsDict[len(varsDict)-1].get(var) is not None
 
     def smartPrint(self, obj):
         if type(obj) == list:
@@ -37,10 +38,27 @@ class EvalVisitor(ExprVisitor):
                 else:
                     print(o.getText(), end =" ")
 
-        else :
+        elif type(obj) == int:
             print(obj, end =" ")
+        elif obj[0] == '"' and obj[len(obj) - 1] == '"':
+           print(obj[1:len(obj)-1],end = " ")
+        else:
+            print(self.getVar(obj), end = " ")
 
-        print()
+    def nota2Int(self, nota):
+        if len(nota) == 1:
+             nota.append(4)
+        if nota == 'A0': return 0
+        if nota == 'B0': return 1
+        return notes[nota[0]]+7*(int(nota[1])-1)
+
+    def int2Nota(delf, nota):
+        if nota == 0: return 'A0'
+        if nota == 1: return 'B0'
+        octave = nota/7 + 1
+        tone = list(notes.keys())[list(notes.values()).index(nota % 7)]
+        return tone+str(octave)
+
 
     def visitMain(self, ctx):
         l = list(ctx.getChildren())
@@ -50,13 +68,15 @@ class EvalVisitor(ExprVisitor):
 
 
     def visitValor(self, ctx):
-
         l = list(ctx.getChildren())
         return int(l[0].getText())
 
     def visitParaula(self, ctx):
         l = list(ctx.getChildren())
-        return l[0].getText()[1:len(l[0].getText())-1]
+        return l[0].getText()
+
+    def visitNota(self, ctx):
+        return self.nota2Int(list(ctx.getChildren())[0].getText())
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
@@ -70,12 +90,13 @@ class EvalVisitor(ExprVisitor):
     def visitAcces(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
-        return array[self.visit(l[2])- 1]
+        val = array[self.visit(l[2])- 1]
+        return  val if type(val) == int else self.getVar(val)
 
     def visitAppend(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
-        array.append(self.visit(l[2]))
+        array.append(l[2].getText() if self.isVar(l[2].getText()) else self.visit(l[2]))
         self.setVar(l[0].getText(), array)
         
     def visitCut(self, ctx):
@@ -116,15 +137,22 @@ class EvalVisitor(ExprVisitor):
         return self.getVar(l[0].getText())
 
 
-    def visitBool(self, ctx):
+    def visitIf(self, ctx):
         l = list(ctx.getChildren())
         if self.visit(l[1]):
-            self.visit(l[3])
+            self.visit(l[2])
+    
+    def visitElseIf(self, ctx):
+        l = list(ctx.getChildren())
+        if self.visit(l[1]):
+            self.visit(l[2])
+        else:
+            self.visit(l[4])
 
     def visitWhile(self, ctx):
         l = list(ctx.getChildren())
         while self.visit(l[1]):
-            self.visit(l[3])
+            self.visit(l[2])
 
 
 
@@ -142,8 +170,15 @@ class EvalVisitor(ExprVisitor):
 
     def visitLess(self, ctx):
         l = list(ctx.getChildren())
-        return self.visit(l[0]) < self.visit(l[2])        
+        return self.visit(l[0]) < self.visit(l[2])
 
+    def visitGreaterEqual(self, ctx):
+        l = list(ctx.getChildren())
+        return self.visit(l[0]) >= self.visit(l[2]) 
+
+    def visitLessEqual(self, ctx): 
+        l = list(ctx.getChildren())
+        return self.visit(l[0]) <= self.visit(l[2])
 
 
 
@@ -153,13 +188,19 @@ class EvalVisitor(ExprVisitor):
     
     def visitEscriu(self, ctx):
         l = list(ctx.getChildren())
-        p = self.visit(l[1])
-        self.smartPrint(p)
+        for i in l[1:]:
+            self.smartPrint(self.visit(i))
+        print()
 
     def visitLlegeix(self, ctx):
         l = list(ctx.getChildren())
         var = input()
         self.setVar(l[1].getText(), int(var) if var.isnumeric() else var)
+
+    def visitPlay(self, ctx):
+        l = list(ctx.getChildren())
+
+
             
     def visitSuma(self, ctx):
         l = list(ctx.getChildren())
