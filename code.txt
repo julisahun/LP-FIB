@@ -1,16 +1,18 @@
-suma a b |:
-    write a + b
+Suma a b |:
+    <!> a + b
 :|
 
-main a |:
+Main |:
     ~~~ inline comment ~~~
     x <- 2
-    y <- 1
+    <!> x
+    <!> "maria petarda"
     l <- {1 2 3 x}
-    write x
-    suma x y
-    write l
-    x <- 12
-    write x
-    write l
+    <!> l
+    <!> l[1]
+    l << 5
+    <!> l    
+    <!> #l
+    l 8< 2
+    <!> l
 :|
