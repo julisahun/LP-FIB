@@ -16,7 +16,7 @@ class EvalVisitor(ExprVisitor):
 
     def getVar(self, var):
         # print("getting variable " + var)
-        if varsDict[len(varsDict)-1][var] is not None:
+        if varsDict[len(varsDict)-1].get(var) is not None:
             return varsDict[len(varsDict)-1][var]
         else:
             raise Exception("Variable not declared at this scope")
@@ -36,14 +36,14 @@ class EvalVisitor(ExprVisitor):
                 elif self.isVar(o):
                     print(self.getVar(o), end =" ")
                 else:
-                    print(o.getText(), end =" ")
+                    print(o, end =" ")
 
-        elif type(obj) == int:
+        elif type(obj) == int or obj.isnumeric():
             print(obj, end =" ")
         elif obj[0] == '"' and obj[len(obj) - 1] == '"':
-           print(obj[1:len(obj)-1],end = " ")
+            print(obj[1:len(obj)-1],end = " ")
         else:
-            print(self.getVar(obj), end = " ")
+            print(obj, end = " ")
 
     def nota2Int(self, nota):
         if len(nota) == 1:
@@ -187,6 +187,7 @@ class EvalVisitor(ExprVisitor):
         self.setVar(l[0].getText(),self.visit(l[2]))
     
     def visitEscriu(self, ctx):
+        
         l = list(ctx.getChildren())
         for i in l[1:]:
             self.smartPrint(self.visit(i))
