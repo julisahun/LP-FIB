@@ -151,13 +151,11 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         array.append(l[2].getText() if self.isVar(l[2].getText()) else self.visit(l[2]))
-        self.setVar(l[0].getText(), array)
         
     def visitCut(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         array.pop(self.visit(l[2]) - 1)
-        self.setVar(l[0].getText(), array)
 
     def visitÑam(self, ctx):
         l = list(ctx.getChildren())

@@ -11,7 +11,7 @@ clear:
 	clear
 
 ultraclean:
-	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.txt"|"Expr.g"|"Makefile"|"README.md"|"script.py")'
+	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.txt"|"Expr.g"|"Makefile"|"README.md"|"script.py")'; rm -r .vscode; rm -r .antlr
 
 clean:
 	rm *.midi *.pdf *.lily *.ly *.mp3 *.wav
