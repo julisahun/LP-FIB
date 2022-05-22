@@ -159,6 +159,14 @@ class EvalVisitor(ExprVisitor):
         array.pop(self.visit(l[2]) - 1)
         self.setVar(l[0].getText(), array)
 
+    def visitÑam(self, ctx):
+        l = list(ctx.getChildren())
+        llista = self.getVar(l[0].getText())
+        for (inx,elem) in enumerate(llista):
+            if elem == int(self.visit(l[2])):
+                llista.pop(inx)
+                return
+
 
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
@@ -218,8 +226,11 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         return self.visit(l[0]) != self.visit(l[2])
 
-    def visitMore(self, ctx):
+    def visitGreater(self, ctx):
         l = list(ctx.getChildren())
+        a = self.visit(l[0])
+        b = self.visit(l[2])
+        print(a,b)
         return self.visit(l[0]) > self.visit(l[2]) 
 
     def visitLess(self, ctx):

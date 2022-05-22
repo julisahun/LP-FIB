@@ -39,6 +39,7 @@ instr : WRITE (expr)+                       #Escriu
     | VAR APPEND expr                       #Append
     | VAR CUT expr                          #Cut
     | ARMADURA EQ TONO                      #Signature
+    | VAR PEIXITU expr                      #Ñam
 
     ;
 
@@ -63,6 +64,7 @@ IDENT : '   ';
 IF : 'if';
 ELSE : 'else';
 WHILE : 'while';
+PEIXITU : '><((>';
 
 GT : '>';
 GE : '>=' ;
