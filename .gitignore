@@ -21,3 +21,5 @@ __pycache__/EvalVisitor.cpython-39.pyc
 
 __pycache__/test.cpython-39.pyc
 __pycache__/EvalVisitor.cpython-39.pyc
+.antlr/ExprLexer.java
+__pycache__/test.cpython-39.pyc

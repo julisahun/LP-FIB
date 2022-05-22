@@ -18,6 +18,7 @@ tail = "\x0a\x20\x20\x20\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6c\x61\x79\x6f\x75\x74
 
 class EvalVisitor(ExprVisitor):
     sheet = ""
+    armadura = ""
 
     def getVar(self, var):
         # print("getting variable " + var)
@@ -51,30 +52,35 @@ class EvalVisitor(ExprVisitor):
             print(obj, end = " ")
 
     def nota2Int(self, nota):
-        if len(nota) == 1:
+        valor = 100*int(nota[0])
+        if len(nota) == 2:
              nota.append(4)
-        if nota == 'A0': return 0
-        if nota == 'B0': return 1
-        return notes[nota[0]]+7*(int(nota[1])-1)
+        if nota == 'A0': return valor+0
+        if nota == 'B0': return valor+1
+        return valor+notes[nota[0]]+7*(int(nota[1])-1)
 
-    def int2Nota(self, nota):
-        if nota == 0: return 'A0'
-        if nota == 1: return 'B0'
+    def int2Nota(self, valor):
+        print(valor)
+        nota = str(int(int(valor)/100))
+        valor = valor % 100
+        if valor == 0: return nota + 'A0'
+        if valor == 1: return nota + 'B0'
         octave = int(nota/7) + 1
         tone = list(notes.keys())[list(notes.values()).index(nota % 7)]
-        return tone+str(octave)
+        return nota + tone+str(octave)
 
     def nota2lilypond(self, nota):
-        n = str(nota[0]).lower()
-        if len(nota) == 1: return n
-        i = int(nota[1])
+        tone = nota[-2:]
+        n = str(tone[0]).lower()
+        if len(tone) == 1: return str(n + nota[:-2]) 
+        i = int(tone[1])
         while i < 3:
             n += ","
             i += 1
         while i > 3:
             n += "'"
             i -= 1
-        return str(n + "4")
+        return str(n + nota[:-2])
 
     
     def isNote(self, nota):
@@ -83,9 +89,17 @@ class EvalVisitor(ExprVisitor):
     def getNotes(self, value):
         ret = ""
         for val in value:
-            ret += self.nota2lilypond(self.int2Nota(val))
+            ret += self.nota2lilypond(val)
             ret += ' '
         return ret
+
+    def printSig(self):
+        res = "\key "
+        res += self.armadura[0].lower()
+        res += ' \major' if self.armadura[1] == 'M' else ' \minor'
+        res += '\n        '
+
+        return res
         
 
     def visitMain(self, ctx):
@@ -105,6 +119,11 @@ class EvalVisitor(ExprVisitor):
 
     def visitNota(self, ctx):
         return self.nota2Int(list(ctx.getChildren())[0].getText())
+
+    def visitSignature(self, ctx):
+        l = list(ctx.getChildren())
+        self.armadura = l[2].getText()
+        print(self.armadura)
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
@@ -236,13 +255,16 @@ class EvalVisitor(ExprVisitor):
     def visitPlay(self, ctx):
         l = list(ctx.getChildren())
         f = open("music.ly", "w", encoding="utf-8")   
-        f.write(header + self.getNotes(self.visit(l[1])) + tail)
+        f.write(header + self.printSig() + self.getNotes(self.visit(l[1])) + tail)
         f.close()
         os.system('lilypond music.ly')
         os.system('timidity -Ow -o music.wav music.midi')
         os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
 
 
+    def visitParentized(self, ctx):
+        l = list(ctx.getChildren())
+        return self.visit(l[1])
 
             
     def visitSuma(self, ctx):
@@ -259,8 +281,14 @@ class EvalVisitor(ExprVisitor):
         if l[1].getText() == '*':
             return self.visit(l[0]) * self.visit(l[2])        
         else:
-            return self.visit(l[0]) / self.visit(l[2])
+            if l[2].getText() == '0':
+                raise Exception("Can't devide by 0!" )
+            return int(self.visit(l[0]) / self.visit(l[2]))
         
     def visitPow(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) ** self.visit(l[2])
+
+    def visitMod(self, ctx):
+        l = list(ctx.getChildren()) 
+        return self.visit(l[0]) % self.visit(l[2])

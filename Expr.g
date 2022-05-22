@@ -3,7 +3,9 @@ root : (meth)* EOF                          #Main
 ;
 
 expr :                          
-	<assoc=right> expr POW expr             #Power
+        OP expr CP                          #Parentized
+	    | <assoc=right> expr POW expr       #Power
+        | expr MOD expr                     #Mod
     	| expr (MULT|DIV) expr              #Mult
         | expr MES expr                     #Suma
     	| <assoc=right> expr SUB expr       #Resta
@@ -36,7 +38,8 @@ instr : WRITE (expr)+                       #Escriu
     | HEADER (VAR)*                         #Invoke
     | VAR APPEND expr                       #Append
     | VAR CUT expr                          #Cut
-    
+    | ARMADURA EQ TONO                      #Signature
+
     ;
 
 cond : expr EQ expr                         #Equal
@@ -76,7 +79,10 @@ PLAY : '<:>' ;
 ASSIG : '<-';
 VAR : [a-z]([a-z]|[A-Z])*;
 NUM : [0-9]+ ;
-NOTA : [A-G][0-8] ;
+NOTA : ('2'|'4'|'8'|'16')[A-G][0-8] ;
+TONO : [A-G]MODO ;
+MODO : ('M'|'m') ;
+ARMADURA : 'Arm' ;
 BOOLEAN : ('true'| 'false') ;
 HEADER : [A-Z]([a-z]|[A-Z])*;
 COMMENT : '~~~' .*? '~~~' -> skip ;
@@ -89,5 +95,6 @@ SUB : '-';
 MULT : '*';
 DIV : '/';
 POW : '^';
+MOD : '%' ;
 WS : [ \n]+ -> skip ;
 SPACE : ' '-> skip;
