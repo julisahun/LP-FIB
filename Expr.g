@@ -17,7 +17,7 @@ expr :
     ;
 
     
-llista : OC (NUM|VAR)* CC  ;  
+llista : OC (NUM|VAR|NOTA)* CC  ;  
 
 meth : HEADER (VAR)* body                   #Method
     ;
@@ -36,6 +36,7 @@ instr : WRITE (expr)+                       #Escriu
     | HEADER (VAR)*                         #Invoke
     | VAR APPEND expr                       #Append
     | VAR CUT expr                          #Cut
+    
     ;
 
 cond : expr EQ expr                         #Equal

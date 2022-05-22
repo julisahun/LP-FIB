@@ -1,4 +1,6 @@
 from re import L
+import os
+import functools
 
 
 if __name__ is not None and "." in __name__:
@@ -11,8 +13,11 @@ else:
 varsDict = [{}]
 methDict = {}
 notes = dict(A=0, B=1, C=2, D=3, E=4, F=5, G=6)
+header = "\x5c\x76\x65\x72\x73\x69\x6f\x6e\x20\x22\x32\x2e\x32\x32\x2e\x31\x22\x0a\x5c\x73\x63\x6f\x72\x65\x20\x7b\x0a\x20\x20\x20\x20\x5c\x61\x62\x73\x6f\x6c\x75\x74\x65\x20\x7b\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x5c\x74\x65\x6d\x70\x6f\x20\x34\x20\x3d\x20\x31\x32\x30\x0a\x20\x20\x20\x20\x20\x20\x20\x20"
+tail = "\x0a\x20\x20\x20\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6c\x61\x79\x6f\x75\x74\x20\x7b\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6d\x69\x64\x69\x20\x7b\x20\x7d\x0a\x7d"
 
 class EvalVisitor(ExprVisitor):
+    sheet = ""
 
     def getVar(self, var):
         # print("getting variable " + var)
@@ -52,13 +57,36 @@ class EvalVisitor(ExprVisitor):
         if nota == 'B0': return 1
         return notes[nota[0]]+7*(int(nota[1])-1)
 
-    def int2Nota(delf, nota):
+    def int2Nota(self, nota):
         if nota == 0: return 'A0'
         if nota == 1: return 'B0'
-        octave = nota/7 + 1
+        octave = int(nota/7) + 1
         tone = list(notes.keys())[list(notes.values()).index(nota % 7)]
         return tone+str(octave)
 
+    def nota2lilypond(self, nota):
+        n = str(nota[0]).lower()
+        if len(nota) == 1: return n
+        i = int(nota[1])
+        while i < 3:
+            n += ","
+            i += 1
+        while i > 3:
+            n += "'"
+            i -= 1
+        return str(n + "4")
+
+    
+    def isNote(self, nota):
+        return (len(nota) > 0 and str(nota[0]) >= 'A' and str(nota[0]) <= 'G') and (len(nota) == 1 or (len(nota) == 2 and int(nota[1]) >= 0 and int(nota[1]) <= 8))
+
+    def getNotes(self, value):
+        ret = ""
+        for val in value:
+            ret += self.nota2lilypond(self.int2Nota(val))
+            ret += ' '
+        return ret
+        
 
     def visitMain(self, ctx):
         l = list(ctx.getChildren())
@@ -80,8 +108,15 @@ class EvalVisitor(ExprVisitor):
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
-        return list(map(lambda x: int(x.getText()) if x.getText().isnumeric()
-                        else x.getText(), l[1:len(l)-1]))
+        ret = []
+        for i in l[1:len(l)-1]:
+            if i.getText().isnumeric():
+                ret.append(int(i.getText()))
+            elif self.isNote(i.getText()):
+                ret.append(self.nota2Int(i.getText()))
+            else:
+                ret.append(i.getText())
+        return ret
 
     def visitLength(self, ctx):
         l = list(ctx.getChildren())
@@ -200,6 +235,13 @@ class EvalVisitor(ExprVisitor):
 
     def visitPlay(self, ctx):
         l = list(ctx.getChildren())
+        f = open("music.ly", "w", encoding="utf-8")   
+        f.write(header + self.getNotes(self.visit(l[1])) + tail)
+        f.close()
+        os.system('lilypond music.ly')
+        os.system('timidity -Ow -o music.wav music.midi')
+        os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
+
 
 
             
