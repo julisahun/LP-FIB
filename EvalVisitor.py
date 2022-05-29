@@ -16,6 +16,7 @@ notes = dict(A=0, B=1, C=2, D=3, E=4, F=5, G=6)
 header = "\x5c\x76\x65\x72\x73\x69\x6f\x6e\x20\x22\x32\x2e\x32\x32\x2e\x31\x22\x0a\x5c\x73\x63\x6f\x72\x65\x20\x7b\x0a\x20\x20\x20\x20\x5c\x61\x62\x73\x6f\x6c\x75\x74\x65\x20\x7b\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x5c\x74\x65\x6d\x70\x6f\x20\x34\x20\x3d\x20\x31\x32\x30\x0a\x20\x20\x20\x20\x20\x20\x20\x20"
 tail = "\x0a\x20\x20\x20\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6c\x61\x79\x6f\x75\x74\x20\x7b\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6d\x69\x64\x69\x20\x7b\x20\x7d\x0a\x7d"
 
+
 class EvalVisitor(ExprVisitor):
     sheet = ""
     armadura = ""
@@ -38,33 +39,37 @@ class EvalVisitor(ExprVisitor):
         if type(obj) == list:
             for o in obj:
                 if type(o) == int:
-                    print(o, end =" ")
+                    print(o, end=" ")
                 elif self.isVar(o):
-                    print(self.getVar(o), end =" ")
+                    print(self.getVar(o), end=" ")
                 else:
-                    print(o, end =" ")
+                    print(o, end=" ")
 
         elif type(obj) == int or obj.isnumeric():
-            print(obj, end =" ")
+            print(obj, end=" ")
         elif obj[0] == '"' and obj[len(obj) - 1] == '"':
-            print(obj[1:len(obj)-1],end = " ")
+            print(obj[1:len(obj) - 1], end=" ")
         else:
-            print(obj, end = " ")
+            print(obj, end=" ")
 
     def nota2Int(self, nota):
         valor = 100*int(nota[0])
         if len(nota) == 2:
-             nota.append(4)
-        if nota == 'A0': return valor+0
-        if nota == 'B0': return valor+1
+            nota.append(4)
+        if nota == 'A0':
+            return valor+0
+        if nota == 'B0':
+            return valor+1
         return valor+notes[nota[0]]+7*(int(nota[1])-1)
 
     def int2Nota(self, valor):
         print(valor)
         nota = str(int(int(valor)/100))
         valor = valor % 100
-        if valor == 0: return nota + 'A0'
-        if valor == 1: return nota + 'B0'
+        if valor == 0:
+            return nota + 'A0'
+        if valor == 1:
+            return nota + 'B0'
         octave = int(nota/7) + 1
         tone = list(notes.keys())[list(notes.values()).index(nota % 7)]
         return nota + tone+str(octave)
@@ -72,7 +77,8 @@ class EvalVisitor(ExprVisitor):
     def nota2lilypond(self, nota):
         tone = nota[-2:]
         n = str(tone[0]).lower()
-        if len(tone) == 1: return str(n + nota[:-2]) 
+        if len(tone) == 1:
+            return str(n + nota[:-2])
         i = int(tone[1])
         while i < 3:
             n += ","
@@ -82,7 +88,6 @@ class EvalVisitor(ExprVisitor):
             i -= 1
         return str(n + nota[:-2])
 
-    
     def isNote(self, nota):
         return (len(nota) > 0 and str(nota[0]) >= 'A' and str(nota[0]) <= 'G') and (len(nota) == 1 or (len(nota) == 2 and int(nota[1]) >= 0 and int(nota[1]) <= 8))
 
@@ -100,14 +105,12 @@ class EvalVisitor(ExprVisitor):
         res += '\n        '
 
         return res
-        
 
     def visitMain(self, ctx):
         l = list(ctx.getChildren())
         for i in l:
             self.visit(i)
         self.visit(methDict['Main'][1])
-
 
     def visitValor(self, ctx):
         l = list(ctx.getChildren())
@@ -144,14 +147,14 @@ class EvalVisitor(ExprVisitor):
     def visitAcces(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
-        val = array[self.visit(l[2])- 1]
-        return  val if type(val) == int else self.getVar(val)
+        val = array[self.visit(l[2]) - 1]
+        return val if type(val) == int else self.getVar(val)
 
     def visitAppend(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         array.append(l[2].getText() if self.isVar(l[2].getText()) else self.visit(l[2]))
-        
+
     def visitCut(self, ctx):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
@@ -160,20 +163,18 @@ class EvalVisitor(ExprVisitor):
     def visitÑam(self, ctx):
         l = list(ctx.getChildren())
         llista = self.getVar(l[0].getText())
-        for (inx,elem) in enumerate(llista):
+        for (inx, elem) in enumerate(llista):
             if elem == int(self.visit(l[2])):
                 llista.pop(inx)
                 return
-
 
     def visitMethod(self, ctx):
         l = list(ctx.getChildren())
         if methDict.get(l[0].getText()) is not None:
             raise Exception("funcio ja declarada")
         params = l[1:len(l) - 1]
-        methDict[l[0].getText()] = [params,l[len(l)-1]]
+        methDict[l[0].getText()] = [params, l[len(l)-1]]
 
-    
     def visitInvoke(self, ctx):
         l = list(ctx.getChildren())
         if methDict.get(l[0].getText()) is None:
@@ -183,7 +184,7 @@ class EvalVisitor(ExprVisitor):
         for val in methDict.get(l[0].getText())[0]:
             self.setVar(val.getText(), varsDict[len(varsDict)-2][l[i+1].getText()])
             i = i+1
-        
+
         self.visit(methDict.get(l[0].getText())[1])
         varsDict.pop()
 
@@ -191,17 +192,16 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         for ins in l[1:len(l)-1]:
             self.visit(ins)
-        
+
     def visitVar(self, ctx):
         l = list(ctx.getChildren())
         return self.getVar(l[0].getText())
-
 
     def visitIf(self, ctx):
         l = list(ctx.getChildren())
         if self.visit(l[1]):
             self.visit(l[2])
-    
+
     def visitElseIf(self, ctx):
         l = list(ctx.getChildren())
         if self.visit(l[1]):
@@ -214,11 +214,9 @@ class EvalVisitor(ExprVisitor):
         while self.visit(l[1]):
             self.visit(l[2])
 
-
-
     def visitEqual(self, ctx):
         l = list(ctx.getChildren())
-        return self.visit(l[0]) == self.visit(l[2])  
+        return self.visit(l[0]) == self.visit(l[2])
 
     def visitNotEqual(self, ctx):
         l = list(ctx.getChildren())
@@ -228,8 +226,8 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         a = self.visit(l[0])
         b = self.visit(l[2])
-        print(a,b)
-        return self.visit(l[0]) > self.visit(l[2]) 
+        print(a, b)
+        return self.visit(l[0]) > self.visit(l[2])
 
     def visitLess(self, ctx):
         l = list(ctx.getChildren())
@@ -237,20 +235,17 @@ class EvalVisitor(ExprVisitor):
 
     def visitGreaterEqual(self, ctx):
         l = list(ctx.getChildren())
-        return self.visit(l[0]) >= self.visit(l[2]) 
+        return self.visit(l[0]) >= self.visit(l[2])
 
-    def visitLessEqual(self, ctx): 
+    def visitLessEqual(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) <= self.visit(l[2])
 
-
-
     def visitAssig(self, ctx):
         l = list(ctx.getChildren())
-        self.setVar(l[0].getText(),self.visit(l[2]))
-    
+        self.setVar(l[0].getText(), self.visit(l[2]))
+
     def visitEscriu(self, ctx):
-        
         l = list(ctx.getChildren())
         for i in l[1:]:
             self.smartPrint(self.visit(i))
@@ -263,41 +258,38 @@ class EvalVisitor(ExprVisitor):
 
     def visitPlay(self, ctx):
         l = list(ctx.getChildren())
-        f = open("music.ly", "w", encoding="utf-8")   
+        f = open("music.ly", "w", encoding="utf-8")
         f.write(header + self.printSig() + self.getNotes(self.visit(l[1])) + tail)
         f.close()
         os.system('lilypond music.ly')
         os.system('timidity -Ow -o music.wav music.midi')
         os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
 
-
     def visitParentized(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[1])
 
-            
     def visitSuma(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) + self.visit(l[2])
-                
+
     def visitResta(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) - self.visit(l[2])
 
-    
     def visitMult(self, ctx):
         l = list(ctx.getChildren())
         if l[1].getText() == '*':
-            return self.visit(l[0]) * self.visit(l[2])        
+            return self.visit(l[0]) * self.visit(l[2])
         else:
             if l[2].getText() == '0':
-                raise Exception("Can't devide by 0!" )
+                raise Exception("Can't devide by 0!")
             return int(self.visit(l[0]) / self.visit(l[2]))
-        
+
     def visitPow(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) ** self.visit(l[2])
 
     def visitMod(self, ctx):
-        l = list(ctx.getChildren()) 
+        l = list(ctx.getChildren())
         return self.visit(l[0]) % self.visit(l[2])
