@@ -94,18 +94,19 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 
 - Explicita:
 
-
+```
     Main |:
         l <- { <1C E G> }
         <:> l
     :|
+```
 - Modal 
 
-
+```
     Main |:
         l <- { <1CM> }
         <:> l
     :|
-
+```
 
 [![DO major](https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")](http://https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")
