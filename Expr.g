@@ -19,7 +19,7 @@ expr :
     ;
 
     
-llista : OC (NUM|VAR|NOTA)* CC  ;  
+llista : OC (NUM|VAR|CHORD|NOTA)* CC  ;  
 
 meth : HEADER (VAR)* body                   #Method
     ;
@@ -34,10 +34,10 @@ instr : WRITE (expr)+                       #Escriu
     | IF cond body                          #If
     | IF cond body ELSE body                #ElseIf
     | WHILE cond body                       #While
-    | VAR ASSIG expr                        #Assig
-    | HEADER (VAR)*                         #Invoke
+    | VAR ASSIG expr                        #Assign
+    | HEADER (expr)*                        #Invoke
     | VAR APPEND expr                       #Append
-    | VAR CUT expr                          #Cut
+    | CUT VAR OV expr CV                    #Cut
     | ARMADURA EQ TONO                      #Signature
     | VAR PEIXITU expr                      #Ñam
 
@@ -81,13 +81,14 @@ PLAY : '<:>' ;
 ASSIG : '<-';
 VAR : [a-z]([a-z]|[A-Z])*;
 NUM : [0-9]+ ;
-NOTA : ('2'|'4'|'8'|'16')[A-G][0-8] ;
+NOTA : ('1'|'2'|'4'|'8'|'16')?[A-G]('#')?[0-8]? ;
+CHORD : '<'((NOTA('M'|'m'))|(NOTA ' ')* NOTA)'>' ;
 TONO : [A-G]MODO ;
 MODO : ('M'|'m') ;
 ARMADURA : 'Arm' ;
 BOOLEAN : ('true'| 'false') ;
 HEADER : [A-Z]([a-z]|[A-Z])*;
-COMMENT : '~~~' .*? '~~~' -> skip ;
+COMMENT : '~~~' ~( '\r' | '\n' )* '~~~' -> skip ;
 PARAULA : '"' .*? '"' ;
 HASHTG : '#' ;
 CUT : '8<' ;

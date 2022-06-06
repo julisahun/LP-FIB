@@ -7,6 +7,7 @@ compile: Expr.g
 
 compilesimple: Expr.g
 	antlr4 -Dlanguage=Python3 -no-listener Expr.g
+
 clear: 
 	clear
 
@@ -18,3 +19,6 @@ clean:
 	
 execute: script.py
 	python3 script.py code.txt
+
+executeMethod: script.py
+	python3 script.py code.txt Hanoi

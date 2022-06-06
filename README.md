@@ -13,7 +13,8 @@ També implementa estructures condicionals de forma de `if` i `else` o de `while
 La lectura i escriputra de JSBash es realitza amb els operadors seguents:
 - `<?>` per llegir del terminal
 - `<!>` per escriure per terminal
-- `<:> `per generar els fitxer musicals
+- `<:>` per generar els fitxer musicals
+
 
 ### Funcions:
 
@@ -94,19 +95,17 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 
 - Explicita:
 
-```
     Main |:
         l <- { <1C E G> }
         <:> l
     :|
-```
 - Modal 
-
-```
     Main |:
         l <- { <1CM> }
         <:> l
     :|
-```
+
 
 [![DO major](https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")](http://https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")
+
+
