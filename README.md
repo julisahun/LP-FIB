@@ -15,6 +15,7 @@ La lectura i escriputra de JSBash es realitza amb els operadors seguents:
 - `<!>` per escriure per terminal
 - `<:>` per generar els fitxer musicals
 
+
 ### Funcions:
 
 JSBash, admet la creació de metodes, per executar un metode en concret, es pot especificar com a parametre d'execusió, en cas de no especificar-se, s'executara el metode anomenat "Main".
@@ -94,14 +95,11 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 
 - Explicita:
 
-
     Main |:
         l <- { <1C E G> }
         <:> l
     :|
 - Modal 
-
-
     Main |:
         l <- { <1CM> }
         <:> l
@@ -109,12 +107,5 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 
 
 [![DO major](https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")](http://https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")
-
-
-
-
-
-
-
 
 
