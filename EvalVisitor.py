@@ -1,5 +1,6 @@
 from re import L
 import os
+import copy
 import functools
 
 
@@ -17,19 +18,81 @@ header = "\x5c\x76\x65\x72\x73\x69\x6f\x6e\x20\x22\x32\x2e\x32\x32\x2e\x31\x22\x
 tail = "\x0a\x20\x20\x20\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6c\x61\x79\x6f\x75\x74\x20\x7b\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6d\x69\x64\x69\x20\x7b\x20\x7d\x0a\x7d"
 
 
+class note:
+    def __init__(self, tone, octave, duration, alteration):
+        self.tone = tone
+        self.octave = int(octave or '4')
+        self.duration = int(duration or '4')
+        self.alteration = ''
+        if alteration:
+            self.alteration = 'is'
+
+    def print(self):
+        print(self.duration, self.tone, self.alteration, self.octave)
+
+    def toLilypond(self):
+        return (self.tone.lower() +
+                self.alteration + (
+                "'" * (self.octave - 3) if self.octave > 3
+                else "," * (3 - self.octave)) +
+                str(self.duration))
+
+    def increment(self, semitones):
+        sus = bool(self.alteration)
+        while semitones > 0:
+            if self.tone == 'B' or self.tone == 'E':
+                self.tone = chr(ord(self.tone) + 1)
+            elif sus:
+                self.tone = chr(ord(self.tone) + 1)
+                sus = False
+            else:
+                sus = True
+            if self.tone > 'G':
+                self.tone = chr(ord(self.tone) - 7)
+            if self.tone == 'C' and not sus:
+                self.octave += 1
+            semitones -= 1
+        self.alteration = 'is' if sus else ''
+        return self
+
+
+class chord:
+    def __init__(self, notes, mode):
+        self.duration = notes[0].duration
+        if len(notes) == 1:
+            base = copy.deepcopy(notes[0])
+            nota2 = copy.deepcopy(base).increment(4 if mode == 'M' else 3)
+            nota3 = copy.deepcopy(nota2).increment(3 if mode == 'M' else 4)
+            self.notes = [base, nota2, nota3]
+        else:
+            self.notes = notes
+
+    def print(self):
+        for nota in self.notes:
+            nota.print()
+
+    def toLilypond(self):
+        res = "<"
+        for nota in self.notes:
+            res += nota.toLilypond()[:-1] + " "
+        res = res[:-1] + ">" + str(self.duration)
+        return res
+
+
 class EvalVisitor(ExprVisitor):
-    sheet = ""
-    armadura = ""
+
+    def __init__(self, method):
+        self.method = method
+        self.sheet = ""
+        self.armadura = ""
 
     def getVar(self, var):
-        # print("getting variable " + var)
         if varsDict[len(varsDict)-1].get(var) is not None:
             return varsDict[len(varsDict)-1][var]
         else:
-            raise Exception("Variable not declared at this scope")
+            raise Exception(var, "Variable not declared at this scope")
 
     def setVar(self, var, value):
-        # print("Setting variable", var, " to ", value)
         varsDict[len(varsDict)-1][var] = value
 
     def isVar(self, var):
@@ -42,6 +105,8 @@ class EvalVisitor(ExprVisitor):
                     print(o, end=" ")
                 elif self.isVar(o):
                     print(self.getVar(o), end=" ")
+                elif type(o) == note:
+                    o.print()
                 else:
                     print(o, end=" ")
 
@@ -52,53 +117,52 @@ class EvalVisitor(ExprVisitor):
         else:
             print(obj, end=" ")
 
-    def nota2Int(self, nota):
-        valor = 100*int(nota[0])
-        if len(nota) == 2:
-            nota.append(4)
-        if nota == 'A0':
-            return valor+0
-        if nota == 'B0':
-            return valor+1
-        return valor+notes[nota[0]]+7*(int(nota[1])-1)
-
-    def int2Nota(self, valor):
-        print(valor)
-        nota = str(int(int(valor)/100))
-        valor = valor % 100
-        if valor == 0:
-            return nota + 'A0'
-        if valor == 1:
-            return nota + 'B0'
-        octave = int(nota/7) + 1
-        tone = list(notes.keys())[list(notes.values()).index(nota % 7)]
-        return nota + tone+str(octave)
-
-    def nota2lilypond(self, nota):
-        tone = nota[-2:]
-        n = str(tone[0]).lower()
-        if len(tone) == 1:
-            return str(n + nota[:-2])
-        i = int(tone[1])
-        while i < 3:
-            n += ","
-            i += 1
-        while i > 3:
-            n += "'"
-            i -= 1
-        return str(n + nota[:-2])
-
     def isNote(self, nota):
-        return (len(nota) > 0 and str(nota[0]) >= 'A' and str(nota[0]) <= 'G') and (len(nota) == 1 or (len(nota) == 2 and int(nota[1]) >= 0 and int(nota[1]) <= 8))
+        try:
+            duration = ''
+            indx = 0
+            while nota[indx].isnumeric():
+                duration += nota[indx]
+                indx += 1
+            if int(duration or '4') not in (1, 2, 4, 8, 16):
+                return False
+            tone = nota[indx]
+            if tone not in notes:
+                return False
+            indx += 1
+            alteration = ''
+            while not(nota[indx].isnumeric()):
+                alteration += nota[indx]
+                indx += 1
+            if alteration and alteration != '#':
+                return False
+            return int(nota[indx]) >= 0 and int(nota[indx]) <= 8 and len(nota) == indx + 1
+        except IndexError:
+            return True
+
+    def isChord(self, chord):
+        if chord[0] != '<' or chord[-1] != '>':
+            return False
+        if (chord[-2] == 'M' or chord[-2] == 'm') and self.isNote(chord[1:-2]):
+            return True
+        for nota in chord[1:-1].split():
+            if not self.isNote(nota):
+                return False
+        return True
 
     def getNotes(self, value):
         ret = ""
+        if type(value) == note:
+            ret = value.toLilypond()
+            return ret
         for val in value:
-            ret += self.nota2lilypond(val)
+            ret += val.toLilypond()
             ret += ' '
         return ret
 
     def printSig(self):
+        if self.armadura == '':
+            return ''
         res = "\key "
         res += self.armadura[0].lower()
         res += ' \major' if self.armadura[1] == 'M' else ' \minor'
@@ -107,10 +171,19 @@ class EvalVisitor(ExprVisitor):
         return res
 
     def visitMain(self, ctx):
+        f = open("music.ly", "w")
+        f.write(header)
+        f.close()
         l = list(ctx.getChildren())
         for i in l:
             self.visit(i)
-        self.visit(methDict['Main'][1])
+        self.visit(methDict[self.method][1])
+        f = open("music.ly", "a")
+        f.write(tail)
+        f.close()
+        # os.system('lilypond music.ly')
+        # os.system('timidity -Ow -o music.wav music.midi')
+        # os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
 
     def visitValor(self, ctx):
         l = list(ctx.getChildren())
@@ -121,12 +194,12 @@ class EvalVisitor(ExprVisitor):
         return l[0].getText()
 
     def visitNota(self, ctx):
-        return self.nota2Int(list(ctx.getChildren())[0].getText())
+        l = list(ctx.getChildren())
+        return self.getNote(l[0].getText())
 
     def visitSignature(self, ctx):
         l = list(ctx.getChildren())
         self.armadura = l[2].getText()
-        print(self.armadura)
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
@@ -135,10 +208,38 @@ class EvalVisitor(ExprVisitor):
             if i.getText().isnumeric():
                 ret.append(int(i.getText()))
             elif self.isNote(i.getText()):
-                ret.append(self.nota2Int(i.getText()))
+                ret.append(self.getNote(i.getText()))
+            elif self.isChord(i.getText()):
+                ret.append(self.getChord(i.getText()))
             else:
                 ret.append(i.getText())
         return ret
+
+    def getNote(self, text):
+        duration = ''
+        octave = 4
+        alteration = ''
+        i = 0
+        while text[i].isnumeric():
+            duration += (text[i])
+            i += 1
+        tone = text[i]
+        i += 1
+        if i < len(text) and text[i] == '#':
+            alteration = text[i]
+            i += 1
+        if (i < len(text)):
+            octave = int(text[i])
+        return note(tone, octave, duration, alteration)
+
+    def getChord(self, text):
+        notes = []
+        for nota in text[1:-1].split():
+            if nota[-1] == 'M' or nota[-1] == 'm':
+                return chord([self.getNote(nota[:-1])], nota[-1])
+            else:
+                notes.append(self.getNote(nota))
+        return chord(notes, '')
 
     def visitLength(self, ctx):
         l = list(ctx.getChildren())
@@ -148,7 +249,8 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         val = array[self.visit(l[2]) - 1]
-        return val if type(val) == int else self.getVar(val)
+        
+        return val if type(val) == int or type(val) == note else self.getVar(val)
 
     def visitAppend(self, ctx):
         l = list(ctx.getChildren())
@@ -157,8 +259,8 @@ class EvalVisitor(ExprVisitor):
 
     def visitCut(self, ctx):
         l = list(ctx.getChildren())
-        array = self.getVar(l[0].getText())
-        array.pop(self.visit(l[2]) - 1)
+        array = self.getVar(l[1].getText())
+        array.pop(self.visit(l[3]) - 1)
 
     def visitÑam(self, ctx):
         l = list(ctx.getChildren())
@@ -180,11 +282,24 @@ class EvalVisitor(ExprVisitor):
         if methDict.get(l[0].getText()) is None:
             raise Exception("la funcio no existeix")
         i = 0
+        
+        params = []
+        for i in l[1:]:
+            if self.isVar(i.getText()):
+                node = varsDict[len(varsDict)-1][i.getText()]
+                if type(node) == list:
+                    llista = []
+                    for i in node:
+                        llista.append(self.getVar(i) if self.isVar(i) else i)
+                    params.append(llista)
+                else:
+                    params.append(self.getVar(node) if self.isVar(node) else node)
+            else :
+                params.append(self.visit(i))
+        
         varsDict.append({})
-        for val in methDict.get(l[0].getText())[0]:
-            self.setVar(val.getText(), varsDict[len(varsDict)-2][l[i+1].getText()])
-            i = i+1
-
+        for (var,param) in zip(methDict.get(l[0].getText())[0], params):
+            self.setVar(var.getText(), param)
         self.visit(methDict.get(l[0].getText())[1])
         varsDict.pop()
 
@@ -224,9 +339,6 @@ class EvalVisitor(ExprVisitor):
 
     def visitGreater(self, ctx):
         l = list(ctx.getChildren())
-        a = self.visit(l[0])
-        b = self.visit(l[2])
-        print(a, b)
         return self.visit(l[0]) > self.visit(l[2])
 
     def visitLess(self, ctx):
@@ -241,7 +353,7 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         return self.visit(l[0]) <= self.visit(l[2])
 
-    def visitAssig(self, ctx):
+    def visitAssign(self, ctx):
         l = list(ctx.getChildren())
         self.setVar(l[0].getText(), self.visit(l[2]))
 
@@ -257,13 +369,13 @@ class EvalVisitor(ExprVisitor):
         self.setVar(l[1].getText(), int(var) if var.isnumeric() else var)
 
     def visitPlay(self, ctx):
+        print("playing")
         l = list(ctx.getChildren())
-        f = open("music.ly", "w", encoding="utf-8")
-        f.write(header + self.printSig() + self.getNotes(self.visit(l[1])) + tail)
+        f = open("music.ly", "a")
+        f.write(self.getNotes(self.visit(l[1])))
         f.close()
-        os.system('lilypond music.ly')
-        os.system('timidity -Ow -o music.wav music.midi')
-        os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
+
+
 
     def visitParentized(self, ctx):
         l = list(ctx.getChildren())
