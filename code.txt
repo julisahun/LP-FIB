@@ -1,9 +1,19 @@
-Main |:
-    l <- {2 3 4 5}
-    l << 6
-    l ><((> 5
-    <!> l
-  
+Hanoi |:
+    src <- {C D E F G}
+    dst <- {}
+    aux <- {}
+    HanoiRec #src src dst aux
+:|
 
-    
+HanoiRec n src dst aux |:
+    <!> "post" #src "n" n
+    if n > 0 |:
+        <!> "pre" #src
+        HanoiRec (n - 1) src aux dst
+        <!> "post2" #src
+        note <- src[#src]
+        8< src[#src]
+        dst << note
+        HanoiRec (n - 1) aux dst src
+    :|
 :|
