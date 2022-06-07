@@ -1,8 +1,11 @@
 from re import L
 import os
 import copy
-import functools
-
+from antlr4 import *
+from ExprLexer import ExprLexer
+from ExprParser import ExprParser
+from EvalVisitor import EvalVisitor
+import sys
 
 if __name__ is not None and "." in __name__:
     from .ExprParser import ExprParser
@@ -211,6 +214,8 @@ class EvalVisitor(ExprVisitor):
                 ret.append(self.getNote(i.getText()))
             elif self.isChord(i.getText()):
                 ret.append(self.getChord(i.getText()))
+            elif self.isVar(i.getText()):
+                ret.append(self.getVar(i.getText()))
             else:
                 ret.append(i.getText())
         return ret
@@ -282,26 +287,43 @@ class EvalVisitor(ExprVisitor):
         if methDict.get(l[0].getText()) is None:
             raise Exception("la funcio no existeix")
         i = 0
-        
+
         params = []
         for i in l[1:]:
             if self.isVar(i.getText()):
-                node = varsDict[len(varsDict)-1][i.getText()]
-                if type(node) == list:
-                    llista = []
-                    for i in node:
-                        llista.append(self.getVar(i) if self.isVar(i) else i)
-                    params.append(llista)
-                else:
-                    params.append(self.getVar(node) if self.isVar(node) else node)
-            else :
-                params.append(self.visit(i))
-        
+                params.append(self.getVat(i.getText()))
+            elif self.isNote(i.getText()):
+                params.append(self.getNote(i.getText()))
+            elif self.isChord(i.getText()):
+                params.append(self.getChord(i.getText()))
+            else:
+                params.append(i.getText())
+
         varsDict.append({})
         for (var,param) in zip(methDict.get(l[0].getText())[0], params):
             self.setVar(var.getText(), param)
         self.visit(methDict.get(l[0].getText())[1])
         varsDict.pop()
+        
+        # params = []
+        # for i in l[1:]:
+        #     if self.isVar(i.getText()):
+        #         node = varsDict[len(varsDict)-1][i.getText()]
+        #         if type(node) == list:
+        #             llista = []
+        #             for i in node:
+        #                 llista.append(self.getVar(i) if self.isVar(i) else i)
+        #             params.append(llista)
+        #         else:
+        #             params.append(self.getVar(node) if self.isVar(node) else node)
+        #     else :
+        #         params.append(self.visit(i))
+        
+        # varsDict.append({})
+        # for (var,param) in zip(methDict.get(l[0].getText())[0], params):
+        #     self.setVar(var.getText(), param)
+        # self.visit(methDict.get(l[0].getText())[1])
+        # varsDict.pop()
 
     def visitExecuteBody(self, ctx):
         l = list(ctx.getChildren())
@@ -405,3 +427,14 @@ class EvalVisitor(ExprVisitor):
     def visitMod(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[0]) % self.visit(l[2])
+
+
+method = sys.argv[2] if len(sys.argv) > 2 else "Main"  
+input_stream = FileStream(sys.argv[1])
+lexer = ExprLexer(input_stream)
+token_stream = CommonTokenStream(lexer)
+parser = ExprParser(token_stream)
+tree = parser.root() 
+
+evaluator = EvalVisitor(method)
+evaluator.visit(tree)

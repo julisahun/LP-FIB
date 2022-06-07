@@ -3,22 +3,22 @@ SHELL = /bin/bash
 all: clear compile execute
 
 compile: Expr.g
-	antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.g
+	antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
 
 compilesimple: Expr.g
-	antlr4 -Dlanguage=Python3 -no-listener Expr.g
+	antlr4 -Dlanguage=Python3 -no-listener Expr.jsb
 
 clear: 
 	clear
 
 ultraclean:
-	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.txt"|"Expr.g"|"Makefile"|"README.md"|"script.py")'; rm -r .vscode; rm -r .antlr
+	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.txt"|"Expr.jsb"|"Makefile"|"README.md"|"script.py")'; rm -r .vscode; rm -r .antlr
 
 clean:
 	rm *.midi *.pdf *.lily *.ly *.mp3 *.wav
 	
-execute: script.py
-	python3 script.py code.txt
+execute: EvalVisitor.py
+	python3 EvalVisitor.py code.txt
 
-executeMethod: script.py
-	python3 script.py code.txt Hanoi
+executeMethod: EvalVisitor.py
+	python3 EvalVisitor.py code.txt Hanoi
