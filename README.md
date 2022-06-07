@@ -6,7 +6,7 @@
 Per compilar el programa, s'ha de fer servir la seguent linea de comandes:
     - antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
 Un cop compilat, podem executar-lo amb la seguent comanda:
-    - python3 EvalVisitor.py code.jsb _Metode_
+    - python3 EvalVisitor.py code.jsb Metode
 >Metode fa referencia al nom de la funcio desde la que s'executara el codi, si es deixa en blanc s'asumira "Main"
 
 
