@@ -23,8 +23,8 @@ tail = "\x0a\x20\x20\x20\x20\x7d\x0a\x20\x20\x20\x20\x5c\x6c\x61\x79\x6f\x75\x74
 class note:
     def __init__(self, tone, octave, duration, alteration):
         self.tone = tone
-        self.octave = int(octave or '4')
-        self.duration = int(duration or '4')
+        self.octave = octave
+        self.duration = duration
         self.alteration = ''
         if alteration:
             self.alteration = 'is'
@@ -155,7 +155,7 @@ class EvalVisitor(ExprVisitor):
 
     def getNotes(self, value):
         ret = ""
-        if type(value) == note:
+        if type(value) == note or type(value) == chord:
             ret = value.toLilypond()
             return ret
         for val in value:
@@ -202,7 +202,13 @@ class EvalVisitor(ExprVisitor):
 
     def visitSignature(self, ctx):
         l = list(ctx.getChildren())
+        if self.armadura != '': 
+            raise Exception("Signature already defined")
         self.armadura = l[2].getText()
+        f = open("music.ly", "a")
+        f.write(self.printSig())
+        f.close()
+        
 
     def visitLlista(self, ctx):
         l = list(ctx.getChildren())
@@ -213,6 +219,7 @@ class EvalVisitor(ExprVisitor):
             elif self.isNote(i.getText()):
                 ret.append(self.getNote(i.getText()))
             elif self.isChord(i.getText()):
+                print("chord here")
                 ret.append(self.getChord(i.getText()))
             elif self.isVar(i.getText()):
                 ret.append(self.getVar(i.getText()))
@@ -233,8 +240,11 @@ class EvalVisitor(ExprVisitor):
         if i < len(text) and text[i] == '#':
             alteration = text[i]
             i += 1
+        print(i, len(text))
         if (i < len(text)):
+            print("eps")
             octave = int(text[i])
+            print(octave)
         return note(tone, octave, duration, alteration)
 
     def getChord(self, text):
@@ -255,7 +265,7 @@ class EvalVisitor(ExprVisitor):
         array = self.getVar(l[0].getText())
         val = array[self.visit(l[2]) - 1]
 
-        return val if type(val) == int or type(val) == note else self.getVar(val)
+        return val if type(val) == int or type(val) == note or type(val) == chord else self.getVar(val)
 
     def visitAppend(self, ctx):
 

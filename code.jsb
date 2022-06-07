@@ -1,5 +1,6 @@
 Main |:
-    src <- {C D E F G}
+    Arm = DM
+    src <- {<A0 G8> D E F G}
     dst <- {}
     aux <- {}
     HanoiRec #src src dst aux

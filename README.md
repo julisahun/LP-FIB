@@ -4,9 +4,9 @@
 
 ## Execució del programa:
 Per compilar el programa, s'ha de fer servir la seguent linea de comandes:
-    $ antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
+    - antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
 Un cop compilat, podem executar-lo amb la seguent comanda:
-    $ python3 EvalVisitor.py code.jsb Metode
+    - python3 EvalVisitor.py code.jsb Metode
 >Metode fa referencia al nom de la funcio desde la que s'executara el codi, si es deixa en blanc s'asumira "Main"
 
 
@@ -114,5 +114,14 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 
 
 [![DO major](https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")](http://https://jadebultitude.b-cdn.net/wp-content/uploads/2021/01/Screenshot-2021-01-31-at-20.44.41.jpg "DO major")
+
+### Escala:
+
+Jsbash implementa una instruccio que ens permet definir en quina escala esta escrita la nostra musica.Per ferho farem servir la següuent instrució:
+```
+Arm = DM
+```
+Això per exemple en defineix la escala com a RE Major, es a dir que tindrem el do i el fa sustinguts a la Armadura.
+>Aixó no obstant, per escriure un fa sustingut, seguim necesitant de la espeficació que hem vist anteriorment
 
 
