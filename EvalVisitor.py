@@ -254,11 +254,11 @@ class EvalVisitor(ExprVisitor):
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         val = array[self.visit(l[2]) - 1]
-        
+
         return val if type(val) == int or type(val) == note else self.getVar(val)
 
     def visitAppend(self, ctx):
-        
+
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
         array.append(self.getVar(l[2].getText()) if self.isVar(l[2].getText()) else self.visit(l[2]))
@@ -301,30 +301,10 @@ class EvalVisitor(ExprVisitor):
                 params.append(self.visit(i))
 
         varsDict.append({})
-        for (var,param) in zip(methDict.get(l[0].getText())[0], params):
+        for (var, param) in zip(methDict.get(l[0].getText())[0], params):
             self.setVar(var.getText(), param)
         self.visit(methDict.get(l[0].getText())[1])
         varsDict.pop()
-        
-        # params = []
-        # for i in l[1:]:
-        #     if self.isVar(i.getText()):
-        #         node = varsDict[len(varsDict)-1][i.getText()]
-        #         if type(node) == list:
-        #             llista = []
-        #             for i in node:
-        #                 llista.append(self.getVar(i) if self.isVar(i) else i)
-        #             params.append(llista)
-        #         else:
-        #             params.append(self.getVar(node) if self.isVar(node) else node)
-        #     else :
-        #         params.append(self.visit(i))
-        
-        # varsDict.append({})
-        # for (var,param) in zip(methDict.get(l[0].getText())[0], params):
-        #     self.setVar(var.getText(), param)
-        # self.visit(methDict.get(l[0].getText())[1])
-        # varsDict.pop()
 
     def visitExecuteBody(self, ctx):
         l = list(ctx.getChildren())
@@ -362,8 +342,6 @@ class EvalVisitor(ExprVisitor):
 
     def visitGreater(self, ctx):
         l = list(ctx.getChildren())
-        a =  self.visit(l[0])
-        b = self.visit(l[2])
         return self.visit(l[0]) > self.visit(l[2])
 
     def visitLess(self, ctx):
@@ -399,8 +377,6 @@ class EvalVisitor(ExprVisitor):
         f.write(self.getNotes(self.visit(l[1])))
         f.close()
 
-
-
     def visitParentized(self, ctx):
         l = list(ctx.getChildren())
         return self.visit(l[1])
@@ -431,12 +407,12 @@ class EvalVisitor(ExprVisitor):
         return self.visit(l[0]) % self.visit(l[2])
 
 
-method = sys.argv[2] if len(sys.argv) > 2 else "Main"  
+method = sys.argv[2] if len(sys.argv) > 2 else "Main"
 input_stream = FileStream(sys.argv[1])
 lexer = ExprLexer(input_stream)
 token_stream = CommonTokenStream(lexer)
 parser = ExprParser(token_stream)
-tree = parser.root() 
+tree = parser.root()
 
 evaluator = EvalVisitor(method)
 evaluator.visit(tree)
