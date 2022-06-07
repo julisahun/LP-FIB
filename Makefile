@@ -12,13 +12,13 @@ clear:
 	clear
 
 ultraclean:
-	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.txt"|"Expr.jsb"|"Makefile"|"README.md")'; rm -r .vscode; rm -r .antlr
+	bash -c $$'shopt -s extglob\n rm -rf !("EvalVisitor.py"|"code.jsb"|"Expr.jsb"|"Makefile"|"README.md")'; rm -r .vscode; rm -r .antlr
 
 clean:
 	rm *.midi *.pdf *.lily *.ly *.mp3 *.wav
 	
 execute: EvalVisitor.py
-	python3 EvalVisitor.py code.txt
+	python3 EvalVisitor.py code.jsb
 
 executeMethod: EvalVisitor.py
-	python3 EvalVisitor.py code.txt Hanoi
+	python3 EvalVisitor.py code.jsb Hanoi
