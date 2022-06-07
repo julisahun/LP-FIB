@@ -4,7 +4,6 @@ import copy
 from antlr4 import *
 from ExprLexer import ExprLexer
 from ExprParser import ExprParser
-from EvalVisitor import EvalVisitor
 import sys
 
 if __name__ is not None and "." in __name__:
@@ -112,7 +111,8 @@ class EvalVisitor(ExprVisitor):
                     o.print()
                 else:
                     print(o, end=" ")
-
+        elif type(obj) == note or type(obj) == chord:
+            obj.print()
         elif type(obj) == int or obj.isnumeric():
             print(obj, end=" ")
         elif obj[0] == '"' and obj[len(obj) - 1] == '"':
@@ -184,9 +184,9 @@ class EvalVisitor(ExprVisitor):
         f = open("music.ly", "a")
         f.write(tail)
         f.close()
-        # os.system('lilypond music.ly')
-        # os.system('timidity -Ow -o music.wav music.midi')
-        # os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
+        os.system('lilypond music.ly')
+        os.system('timidity -Ow -o music.wav music.midi')
+        os.system('ffmpeg -i music.wav -codec:a libmp3lame -qscale:a 2 music.mp3')
 
     def visitValor(self, ctx):
         l = list(ctx.getChildren())
@@ -258,9 +258,10 @@ class EvalVisitor(ExprVisitor):
         return val if type(val) == int or type(val) == note else self.getVar(val)
 
     def visitAppend(self, ctx):
+        
         l = list(ctx.getChildren())
         array = self.getVar(l[0].getText())
-        array.append(l[2].getText() if self.isVar(l[2].getText()) else self.visit(l[2]))
+        array.append(self.getVar(l[2].getText()) if self.isVar(l[2].getText()) else self.visit(l[2]))
 
     def visitCut(self, ctx):
         l = list(ctx.getChildren())
@@ -291,13 +292,13 @@ class EvalVisitor(ExprVisitor):
         params = []
         for i in l[1:]:
             if self.isVar(i.getText()):
-                params.append(self.getVat(i.getText()))
+                params.append(self.getVar(i.getText()))
             elif self.isNote(i.getText()):
                 params.append(self.getNote(i.getText()))
             elif self.isChord(i.getText()):
                 params.append(self.getChord(i.getText()))
             else:
-                params.append(i.getText())
+                params.append(self.visit(i))
 
         varsDict.append({})
         for (var,param) in zip(methDict.get(l[0].getText())[0], params):
@@ -361,6 +362,8 @@ class EvalVisitor(ExprVisitor):
 
     def visitGreater(self, ctx):
         l = list(ctx.getChildren())
+        a =  self.visit(l[0])
+        b = self.visit(l[2])
         return self.visit(l[0]) > self.visit(l[2])
 
     def visitLess(self, ctx):
@@ -391,7 +394,6 @@ class EvalVisitor(ExprVisitor):
         self.setVar(l[1].getText(), int(var) if var.isnumeric() else var)
 
     def visitPlay(self, ctx):
-        print("playing")
         l = list(ctx.getChildren())
         f = open("music.ly", "a")
         f.write(self.getNotes(self.visit(l[1])))
