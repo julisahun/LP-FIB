@@ -1,6 +1,6 @@
 # PracticaLP
 
-*La practica consisteix en la creació d'un llenguatge musical anomenat JSBash, capaç de realitzar operacions esperables d'un llenguatge de programacio estandard i, a demes de reproduïr musica.*
+*La practica consisteix en la creació d'un llenguatge musical anomenat JSBash, capaç de realitzar operacions esperables d'un llenguatge de programacio estandard i, a demes de reproduïr musica. Adreçar-se a l'ultim apartat per veure, l'entrega i les seves extencions*
 
 ## Execució del programa:
 Per compilar el programa, s'ha de fer servir la seguent linea de comandes:
@@ -138,4 +138,4 @@ El programa en qüestió compleix amb els requeriments demanats i, ademés imple
 - alteracions de notes (sostinguts)
 - implementació de acords (Modals i Explicits)
 - implementació de armadura i escala
-- implementació del metode "peixet" a les llistesff
+- implementació del metode "peixet" a les llistes
