@@ -6,7 +6,7 @@
 Per compilar el programa, s'ha de fer servir la seguent linea de comandes:
     - antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
 Un cop compilat, podem executar-lo amb la seguent comanda:
-    - python3 EvalVisitor.py code.jsb Metode
+    - python3 EvalVisitor.py code.jsb _Metode_
 >Metode fa referencia al nom de la funcio desde la que s'executara el codi, si es deixa en blanc s'asumira "Main"
 
 
@@ -27,7 +27,7 @@ La lectura i escriputra de JSBash es realitza amb els operadors seguents:
 
 JSBash, admet la creació de metodes, per executar un metode en concret, es pot especificar com a parametre d'execusió, en cas de no especificar-se, s'executara el metode anomenat "Main".
 
-```C++
+```
 Print |:
     x <- 2
     <!> x
@@ -101,14 +101,14 @@ Els acords han d'anar acompanyats de < > per obrir i tancar. En els acords expli
 > Exemple d'acord de DO major:
 
 - Explicita:
-```
+    ```
     Main |:
         l <- { <1C E G> }
         <:> l
     :|
     ```
 - Modal 
-```
+    ```
     Main |:
         l <- { <1CM> }
         <:> l
