@@ -4,9 +4,10 @@
 
 ## Execució del programa:
 Per compilar el programa, s'ha de fer servir la seguent linea de comandes:
-    - antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
+- antlr4 -Dlanguage=Python3 -no-listener -visitor Expr.jsb
+
 Un cop compilat, podem executar-lo amb la seguent comanda:
-    - python3 EvalVisitor.py code.jsb Metode
+- python3 EvalVisitor.py code.jsb _Metode_
 >Metode fa referencia al nom de la funcio desde la que s'executara el codi, si es deixa en blanc s'asumira "Main"
 
 
@@ -35,6 +36,7 @@ Print |:
 ```
 
 Exemple de codi d'una funcio que escriu per consola el numero 2 desde una variable *x*
+Tant els metodes com el codi dins d'un `if`, `else` o `while` va sempre dins d'un block `|: :|` 
 
 
 ### Variables:
@@ -44,7 +46,7 @@ En JSBash, l'assignació de variables es realitza amb l'operador "<-" que assign
 
 ### Llistes:
 
-JSBash implementa les llistes com a tipus de variable. Per assignar una llista s'han d'usar les claus *"{ }"* i els valors de la llista seperats per blancs a l'interior, que tant poden ser, valors numerics, variables, notes o acords. Les variables dins d'una llista són una referencia a elles, i no pas el seu valor.
+JSBash implementa les llistes com a tipus de variable. Per assignar una llista s'han d'usar les claus `{ }` i els valors de la llista seperats per blancs a l'interior, que tant poden ser, valors numerics, variables, notes o acords. Les variables dins d'una llista són una referencia a elles, i no pas el seu valor.
 
 ##### Metodes de Llistes
 sigui *list* una variable de tipus llista:
@@ -71,11 +73,11 @@ Les notes en JSBash estan compostes per 3 camps: (duracio, to, octava)
 
 
 
-- el **to** especifica el to de la nota. El to conte el to de la nota en sistema america A -> LA ... G -> SOL i si te alguna alteració # -> sustingut (JSBash no implementa els bemolls, ja que es una versio simple i els bemolles es poden susbtituir per sustinguts)
+- el **to** especifica el to de la nota. El to conte el to de la nota en sistema america A -> LA ... G -> SOL i si te alguna alteració # -> sostingut (JSBash no implementa els bemolls, ja que es una versio simple i els bemolles es poden susbtituir per sostinguts)
 
 - la **octava** especifica la octava on es troba la nota segons un teclat de piano
 
-> els camps de duracio i octava son OPCIONALS, si no s'especifiquen, s'asumeix un 4 (negre en la octava central)
+> els camps de duracio i octava son <ins>opcionals</ins>, si no s'especifiquen, s'asumeix un 4 (negre en la octava central)
 
 ```
 Main |:
@@ -85,12 +87,13 @@ Main |:
 ```
 
 Exemple de codi que generaria la seguent partitura:
+
 ![](https://image.spreadshirtmedia.net/image-server/v1/mp/compositions/T993A1MPA2181PT1X42Y48D6094478FS7259Cx000000/views/1,width=200,height=200,appearanceId=1,backgroundColor=FFFFFF,noPt=true/pentagrama-con-las-notas-alfombrilla-de-raton.jpg)
 
 
 ### Acords:
 
-Els acords en JSBash poden ser de dos tipus: Modals i explicits.
+Els acords en JSBash poden ser de dos tipus: Modals i Explicits.
 - Els acords **modals** es representen per el to (C,A,G#...) i la modalitat M o m per Major o menor, els acords augmentat, disminuits, etc, es deixen per la seguent versió.
 
 - Els acord **explicits** es representen per les notes del acord que es vol formar, per exemple C4 E4 G4 representa un acord de DO major de forma explicita.
@@ -124,7 +127,15 @@ Jsbash implementa una instruccio que ens permet definir en quina escala esta esc
 ```
 Arm = DM
 ```
-Això per exemple en defineix la escala com a RE Major, es a dir que tindrem el do i el fa sustinguts a la Armadura.
->Aixó no obstant, per escriure un fa sustingut, seguim necesitant de la espeficació que hem vist anteriorment
+Això per exemple en defineix la escala com a RE Major, es a dir que tindrem el do i el fa sostinguts a la Armadura.
+>Aixó no obstant, per escriure un fa sostingut, seguim necesitant de la espeficació que hem vist anteriorment
 
 
+### Entrega:
+El programa en qüestió compleix amb els requeriments demanats i, ademés implementa les següents extencions:
+
+- diferents notes (rodones .. semicorxeres)
+- alteracions de notes (sostinguts)
+- implementació de acords (Modals i Explicits)
+- implementació de armadura i escala
+- implementació del metode "peixet" a les llistesff
